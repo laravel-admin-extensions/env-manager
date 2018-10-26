@@ -52,6 +52,21 @@ class Env extends Model
     }
 
     /**
+     * @param $id
+     * @return bool|null|void
+     */
+    public function deleteEnv($id)
+    {
+        $ids = explode(',', $id);
+        $data = $this->getEnv();
+        foreach ($ids as $val) {
+            $index = array_search($val, array_column($data, 'id'));
+            unset($data[$index]);
+        }
+        return $this->saveEnv($data);
+    }
+
+    /**
      * Get .env variable.
      * @param null $id
      * @return array|mixed

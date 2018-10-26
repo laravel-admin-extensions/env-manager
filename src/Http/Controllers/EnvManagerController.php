@@ -16,6 +16,13 @@ class EnvManagerController extends Controller
 {
     use HasResourceActions;
 
+    private $model;
+
+    public function __construct()
+    {
+        $this->model = new Env();
+    }
+
     public function index(Content $content)
     {
         return $content
@@ -78,7 +85,7 @@ class EnvManagerController extends Controller
      */
     protected function grid()
     {
-        $grid = new Grid(new Env());
+        $grid = new Grid($this->model);
         $grid->key();
         $grid->value();
         return $grid;
@@ -92,8 +99,7 @@ class EnvManagerController extends Controller
      */
     protected function detail($key)
     {
-        $env = new Env();
-        $show = new Show($env->findOrFail($key));
+        $show = new Show($this->model->findOrFail($key));
 
         $show->key('Key');
         $show->value('Value');
@@ -103,11 +109,36 @@ class EnvManagerController extends Controller
 
     protected function form()
     {
-        $form = new Form(new Env());
+        $form = new Form($this->model);
         $form->text('key', 'Key');
         $form->text('value', 'Value');
         return $form;
     }
 
+
+    /**
+     * Destroy data
+     *
+     * @param $id
+     *
+     * @return mixed
+     */
+    public function destroy($id)
+    {
+        if ($this->model->deleteEnv($id)) {
+            $data = [
+                'status' => true,
+                'message' => trans('admin.delete_succeeded'),
+            ];
+        } else {
+
+            $data = [
+                'status' => false,
+                'message' => trans('admin.delete_failed'),
+            ];
+        }
+
+        return response()->json($data);
+    }
 
 }
